@@ -36,14 +36,14 @@ public class UserServiceImplTest {
 
 	@Before
 	public void setUp() throws Exception {
-//		if (id == null) {
-//			List<User> list = userService.findAll();
-//			if (list != null && !list.isEmpty()) {
-//				User user = list.get(list.size() - 1);
-//				id = user.getId();
-//			}
-//		}
-//		System.out.println("待测试前：id=" + id);
+		if (id == null) {
+			List<User> list = userService.findAll();
+			if (list != null && !list.isEmpty()) {
+				User user = list.get(list.size() - 1);
+				id = user.getId();
+			}
+		}
+		System.out.println("待测试前：id=" + id);
 	}
 
 	@Test
