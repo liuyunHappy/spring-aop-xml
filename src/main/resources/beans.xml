@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- Spring 读取db.properties -->
+	<context:property-placeholder location="classpath:db.properties" />
+
+	<bean id="userService" class="com.liuyun.aop.service.impl.UserServiceImpl">
+		<property name="userDao" ref="userDao"></property>
+	</bean>
+
+	<bean id="userDao" class="com.liuyun.aop.dao.impl.UserDaoImpl">
+		<property name="jdbcTemplate" ref="jdbcTemplate"></property>
+	</bean>
+
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+
+	<!-- spring-jdbc内置数据源 -->
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${jdbc.driverClass}"></property>
+		<property name="url" value="${jdbc.jdbcUrl}"></property>
+		<property name="username" value="${jdbc.user}"></property>
+		<property name="password" value="${jdbc.password}"></property>
+	</bean>
+
+	<!-- 通知类交给spring进行管理 -->
+	<bean id="myAopAdvice" class="com.liuyun.aop.utils.MyAopAdvice"></bean>
+
+	<aop:config>
+		<!-- 设置切入点（哪些类的哪些方法需要增强） -->
+		<aop:pointcut id="servicePt" expression="execution(* com.liuyun.aop.service.impl.*.*(..))" />
+		<!-- 使用切面将切入点和通知类进行绑定：即通知类的哪些方法在哪个位置对切入点方法进行增强-->
+		<aop:aspect id="advice" ref="myAopAdvice">
+			<aop:before method="before" pointcut-ref="servicePt" />
+			<aop:after-returning method="afterReturning" pointcut-ref="servicePt" />
+			<aop:after-throwing method="afterThrowing" pointcut-ref="servicePt" />
+			<aop:after method="after" pointcut-ref="servicePt" />
+			<aop:around method="around" pointcut-ref="servicePt" />
+		</aop:aspect>
+	</aop:config>
+</beans>
